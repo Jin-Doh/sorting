@@ -45,10 +45,11 @@ jobs:
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0 --match "v*" || echo "v0.1.0")
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-          VERSION=$(echo $LATEST_TAG | awk -F. -v OFS=. '{$NF += 1 ; print}')
-          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+          NEW_VERSION=$(echo $LATEST_TAG | awk -F. -v OFS=. '{$NF += 1 ; print}')
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Create New Tag
+        id: create_tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -59,15 +60,15 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.VERSION }}
-          name: Release ${{ env.VERSION }}
+          tag_name: ${{ env.NEW_VERSION }}
+          name: Release ${{ env.NEW_VERSION }}
           draft: false
           prerelease: false
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.VERSION }}
+          tag_name: ${{ env.NEW_VERSION }}
           files: |
             sorting-darwin
             sorting-darwin-arm64
