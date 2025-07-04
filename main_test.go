@@ -20,6 +20,8 @@ func TestSortingIntegration(t *testing.T) {
 		t.Fatalf("failed to close temp file: %v", err)
 	}
 
+	originalArgs := os.Args
+	defer func() { os.Args = originalArgs }()
 	os.Args = []string{"cmd", "--file", tempFile.Name()}
 	main()
 
