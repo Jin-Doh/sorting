@@ -29,6 +29,10 @@ jobs:
         run: |
           GOOS=linux GOARCH=amd64 go build -o sorting-linux main.go
 
+      - name: Build binary (Linux arm64)
+        run: |
+          GOOS=linux GOARCH=arm64 go build -o sorting-arm64 main.go
+
       - name: Build binary (Windows amd64)
         run: |
           GOOS=windows GOARCH=amd64 go build -o sorting.exe main.go
@@ -47,7 +51,8 @@ jobs:
         with:
           tag_name: ${{ github.sha }}
           files: |
-            sorting
-            sorting-arm64
+            sorting-darwin
+            sorting-darwin-arm64
             sorting-linux
+            sorting-linux-arm64
             sorting.exe
