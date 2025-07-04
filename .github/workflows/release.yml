@@ -17,6 +17,9 @@ jobs:
         with:
           go-version: "1.21"
 
+      - name: Run go test
+        run: go test -v ./...
+
       - name: Build binary (macOS amd64)
         run: |
           GOOS=darwin GOARCH=amd64 go build -o sorting-darwin main.go
@@ -37,11 +40,20 @@ jobs:
         run: |
           GOOS=windows GOARCH=amd64 go build -o sorting.exe main.go
 
-      - name: Get Semantic Version
+      - name: Get Latest Version
         id: get_version
         run: |
-          VERSION=$(git describe --tags --abbrev=0 --match "v*" || echo "v0.1.0")
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          LATEST_TAG=$(git describe --tags --abbrev=0 --match "v*" || echo "v0.1.0")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          VERSION=$(echo $LATEST_TAG | awk -F. -v OFS=. '{$NF += 1 ; print}')
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Create New Tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ env.NEW_VERSION }}
+          git push origin ${{ env.NEW_VERSION }}
 
       - name: Create Release
         id: create_release
