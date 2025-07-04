@@ -19,11 +19,11 @@ jobs:
 
       - name: Build binary (macOS amd64)
         run: |
-          GOOS=darwin GOARCH=amd64 go build -o sorting main.go
+          GOOS=darwin GOARCH=amd64 go build -o sorting-darwin main.go
 
       - name: Build binary (macOS arm64)
         run: |
-          GOOS=darwin GOARCH=arm64 go build -o sorting-arm64 main.go
+          GOOS=darwin GOARCH=arm64 go build -o sorting-darwin-arm64 main.go
 
       - name: Build binary (Linux amd64)
         run: |
@@ -31,25 +31,31 @@ jobs:
 
       - name: Build binary (Linux arm64)
         run: |
-          GOOS=linux GOARCH=arm64 go build -o sorting-arm64 main.go
+          GOOS=linux GOARCH=arm64 go build -o sorting-linux-arm64 main.go
 
       - name: Build binary (Windows amd64)
         run: |
           GOOS=windows GOARCH=amd64 go build -o sorting.exe main.go
 
+      - name: Get Semantic Version
+        id: get_version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 --match "v*" || echo "v0.1.0")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.sha }}
-          name: Release ${{ github.sha }}
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.sha }}
+          tag_name: ${{ env.VERSION }}
           files: |
             sorting-darwin
             sorting-darwin-arm64
